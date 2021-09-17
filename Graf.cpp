@@ -90,6 +90,25 @@ bool find_cycle(const vector<vector<int>>& g)
 
 }
 
+void topologcy_sort_dfs(const vector<vector<int>>& g, vector<int>& res, vector<bool>& visited, int v)
+{
+    visited[v] = true;
+    for (int u : g[v])
+        if (!visited[u])
+            topologcy_sort_dfs(g, res, visited, u);
+    res.push_back(v);
+}
+
+
+void topologcy_sort(const vector<vector<int>>& g, vector<int>& res)
+{
+    vector<bool> visited(g.size());
+    for (int v = 0; v < g.size(); ++v)
+        if (!visited[v])
+            topologcy_sort_dfs(g, res, visited, v);
+    reverse(res.begin(), res.end()); //переворачиваем т.к. в начале нужны вершины, от которых исходят рёбра
+}
+
 int main()
 {
     //неорграф
