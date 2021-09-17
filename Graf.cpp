@@ -2,6 +2,13 @@
 #include <vector>
 using namespace std;
 
+enum color
+{
+    white,
+    gray,
+    black
+};
+
 bool is_connected_dfs(const vector<vector<int>>& g, vector<bool>& visited, int v, int v1) {
     cout << "Current vertex " << v << endl;
 
@@ -40,23 +47,75 @@ bool is_connected(const vector<vector<int>>& v, int first, int second) {
     return is_connected_dfs(v, vis, first, second);
 }
 
+bool find_cycle_directed_dfs(const vector<vector<int>>& g, vector<color>& colors, int v)
+{
+    cout << "* in" << v << endl;
+    colors[v] = gray;
+    for (int u : g[v])
+        if (colors[u] == gray || (colors[u] == white && find_cycle_directed_dfs(g, colors, u)))
+            return true;
+    colors[v] = black;
+    cout << "** out" << v << endl;
+    return false;
+}
+
+bool find_directed_cycle(const vector<vector<int>>& g)
+{
+    vector<color> colors(g.size(), white);
+    for (int v = 0; v < g.size(); ++v)
+        if (colors[v] == white && find_cycle_directed_dfs(g, colors, v))
+            return true;
+    return false;
+}
+
+bool find_cycle_dfs(const vector<vector<int>>& g, vector<color>& colors, int p, int v) //p-родитель, завели для неоргафа, чтобы мы не взяли за цикл 0-1 1-0
+{
+    cout << '* in' << v << endl;
+    colors[v] = gray;
+    for (int u : g[v])
+        if (u != p && (colors[u] == gray || (colors[u] == white && find_cycle_dfs(g, colors, v, u))))
+            return true;
+    colors[v] = black;
+    cout << "** out" << v << endl;
+    return false;
+}
+
+bool find_cycle(const vector<vector<int>>& g)
+{
+    vector<color> colors(g.size(), white);
+    for (int v = 0; v < g.size(); ++v)
+        if (colors[v] == white && find_cycle_dfs(g, colors, -1, v))
+            return true;
+    return false;
+
+}
+
 int main()
 {
     //неорграф
     int n, first, second, k;
     cin >> n >> k; //k-кол рёбер
-    vector<vector<int>> v(n);
+    vector<vector<int>> g(n);
     for (int i = 0; i < k; ++i) {
         cin >> first >> second;
-        v[first].push_back(second);
-        v[second].push_back(first); //теперь ориентированный
+        g[first].push_back(second);
+        //g[second].push_back(first); //теперь неориентированный
     }
+    //cout << find_cycle(g);
     //cin >> first >> second;
     //cout << is_connected(v, first, second);
-    vector<vector<int>> comp = components(v);
+    /*vector<vector<int>> comp = components(v);
     for (int i = 0; i < comp.size(); ++i)
         for (int j = 0; j < comp[i].size(); ++j)
-            cout << "comp " << i << " vertex " << comp[i][j] << endl;
-    return 0;
+            cout << "comp " << i << " vertex " << comp[i][j] << endl;*/
+    cout<<find_directed_cycle(g);
+    //    for(auto x: v)
+    //    {
+    //        for(int s: x)
+    //            cout << s << " ";
+    //        cout << endl;
+    //     }
+    return 0;    
+    
 }
 
