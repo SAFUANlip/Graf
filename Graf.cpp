@@ -6,12 +6,10 @@ int main()
     //неорграф
     int n, m;
     cin >> n >> m; //k-кол рёбер
-    DirGraf gr(n, m);
-    auto res = gr.kosaraju();
+    UnGraf gr(n, m);
+    auto res = gr.find_bridge();
     for (auto e : res) {
-        for (auto i : e)
-            cout << i << ' ';
-        cout << endl;
+        cout << e.first << " " << e.second << endl;
     }
     //cout << find_cycle(g);
     //cin >> first >> second;

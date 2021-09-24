@@ -57,6 +57,7 @@ protected:
     ~Graf() {
         g.clear();
     }
+
     virtual bool find_cycle() = 0;
     
     void components_dfs(vector<int>& c, int v, int ci) {
@@ -73,6 +74,7 @@ protected:
             comp[c[v]].push_back(v);
         return comp;
     }
+
 };
 
 class DirGraf : public Graf {
@@ -104,10 +106,7 @@ public:
         return false;
     }
 
-    /*void find_bridge()
-    {
-
-    }*/
+    
  
     vector<vector<int>> kosaraju()
     {
@@ -202,7 +201,21 @@ public:
         return false;
     }
 
+    vector<pair<int,int>> find_bridge()
+    {
+        vector<bool> mark(ver);
+        vector<int> in(ver);
+        vector<int> up(ver);
+        dfs_bridge(0, 0, in, up, mark);
+        return bridge;
+    }
+
+
+
 private:
+    vector<pair<int, int>> bridge;
+    int time=0;
+
     bool find_cycle_dfs(vector<color>& colors, int p, int v) //p-родитель, завели дл€ неоргафа, чтобы мы не вз€ли за цикл 0-1 1-0
     {
         cout << "* in " << v << endl;
@@ -213,5 +226,29 @@ private:
         colors[v] = black;
         cout << "** out " << v << endl;
         return false;
+    }
+    
+    void dfs_bridge(int v, int p, vector<int> &in, vector<int> &up, vector<bool> &mark)
+    {
+        in[v] = time++;
+        up[v] = in[v];
+        mark[v] = true;
+        for (auto u : g[v]) {
+            if (u == p)
+                continue;
+
+            if (g[u].size() == 1)
+                bridge.push_back(make_pair(u, v));
+
+            if (!mark[u]) {
+                dfs_bridge(u, v, in, up, mark);
+                up[v] = min(up[v], up[u]);
+            }
+            else
+                up[v] = min(up[v], in[u]);
+            
+            if (v!=p && up[v] >= in[v])
+                bridge.push_back(make_pair(v, p));
+        }
     }
 };
