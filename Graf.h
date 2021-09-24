@@ -22,10 +22,8 @@ public:
         for (int v = 0; v < g.size(); ++v)
             if (c[v] == -1)
                 components_dfs(c, v, ci++);
-        vector<vector<int>> comp(ci);
-        for (int v = 0; v < c.size(); ++v)
-            comp[c[v]].push_back(v);
-        return comp;
+
+        return(make_components(c, ci));
     }
 
 
@@ -43,12 +41,7 @@ private:
         return false;
     }
 
-    void components_dfs(vector<int>& c, int v, int ci) {
-        c[v] = ci;
-        for (int u : g[v])
-            if (c[u] == -1)
-                components_dfs(c, u, ci);
-    }
+    
 
 protected:
     enum color
@@ -66,6 +59,20 @@ protected:
     }
     virtual bool find_cycle() = 0;
     
+    void components_dfs(vector<int>& c, int v, int ci) {
+        c[v] = ci;
+        for (int u : g[v])
+            if (c[u] == -1)
+                components_dfs(c, u, ci);
+    }
+
+    vector<vector<int>> make_components(vector<int> &c, int count)
+    {
+        vector<vector<int>> comp(count);
+        for (int v = 0; v < c.size(); ++v)
+            comp[c[v]].push_back(v);
+        return comp;
+    }
 };
 
 class DirGraf : public Graf {
@@ -97,8 +104,51 @@ public:
         return false;
     }
 
+    /*void find_bridge()
+    {
+
+    }*/
+ 
+    vector<vector<int>> kosaraju()
+    {
+        inverted = invert();
+        vector<bool> visited(inverted.size());
+        vector<int> out(inverted.size());
+
+        for (int v = 0; v < inverted.size(); ++v)
+            if (!visited[v])
+                dfs_kos(visited, out, v);
+        reverse(out.begin(), out.end());
+
+        vector<int> c(g.size(), -1);
+        int ci = 0;
+        for (int i = 0; i < g.size(); ++i)
+            if (c[out[i]] == -1)
+                components_dfs(c, out[i], ci++);
+        return(make_components(c, ci));
+    }
+
 private:
     vector<int> top_s;
+    vector<vector<int>> inverted;
+
+    void dfs_kos(vector<bool> & visited, vector<int>& out, int v)
+    {
+        visited[v] = true;
+        for (int u : inverted[v])
+            if (!visited[u])
+                dfs_kos(visited, out, u);
+        out.push_back(v);
+    }
+
+    vector<vector<int>> invert()
+    {
+        inverted.resize(g.size());
+        for (int v = 0; v < g.size(); ++v)
+            for (int u : g[v])
+                inverted[u].push_back(v);
+        return inverted;
+    }
 
     void topologcy_sort()
     {
