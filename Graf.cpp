@@ -3,6 +3,11 @@ using namespace std;
 
 int main()
 {
+    
+/*Little bit chenges for seting
+github working	
+*/	
+	
     //неорграф
     int n, m;
     cin >> n >> m; //k-кол рёбер
