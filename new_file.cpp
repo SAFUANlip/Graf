@@ -1,9 +1,6 @@
 #include <iostream>
-
-// Ah-ha-ha "not funny"
+// git, how are you?
 
 int main(){
 	int x = 5>7 ? 5: 7;
-//
-//
 }
